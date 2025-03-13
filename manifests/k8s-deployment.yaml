@@ -15,20 +15,10 @@ spec:
         app: e-commerce-web-app
     spec:
       containers:
-      - name: e-commerce-web-app-container
+      - name: web-app-container
         image: your-dockerhub-username/e-commerce-web-app:latest
         ports:
         - containerPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: e-commerce-web-app-service
-spec:
-  selector:
-    app: e-commerce-web-app
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 80
-  type: LoadBalancer
+      
+
+#edit the image and use your real image link

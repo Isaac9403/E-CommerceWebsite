@@ -5,7 +5,7 @@ FROM nginx:alpine
 WORKDIR /usr/share/nginx/html
 
 # Copy application files into Nginx directory
-COPY . .
+COPY src/ .
 
 # Expose application port
 EXPOSE 80
