@@ -51,8 +51,9 @@ pipeline {
                         
                         // Second step: Retrieve the EKS cluster name from Terraform output
                         script {
-                            env.EKS_CLUSTER_NAME = sh(script: "terraform output -raw eks_cluster_name", returnStdout: true).trim()
-                            sh "echo '${env.EKS_CLUSTER_NAME}'"
+                            def clusterName = sh(script: "terraform output -raw eks_cluster_name", returnStdout: true).trim()
+                    env.EKS_CLUSTER_NAME = clusterName
+                    echo "EKS Cluster Name: ${env.EKS_CLUSTER_NAME}"
                         }
                     }
                 }
