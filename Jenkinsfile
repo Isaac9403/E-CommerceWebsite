@@ -8,7 +8,7 @@ pipeline {
         ECR_REPOSITORY = 'my-ecr-repo'  // Name of your ECR repository
         EKS_CLUSTER_NAME = 'my-eks-cluster'  // Name of your EKS cluster
         AWS_ACCOUNT_ID = '841162688382'  // Your AWS account ID
-        MANIFEST_DIR = 'manifests/'  // Directory containing Kubernetes YAML files
+        MANIFEST_DIR = 'manifests'  // Directory containing Kubernetes YAML files
     }
 
     triggers {
