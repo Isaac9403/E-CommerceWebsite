@@ -99,7 +99,7 @@ pipeline {
                         sed -i 's|image: .*|image: ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_DEFAULT_REGION}.amazonaws.com/${env.ECR_REPOSITORY}:latest|' ${env.MANIFEST_DIR}/deployment.yaml
                         """
                         sh """
-                        aws eks --region ${AWS_REGION} update-kubeconfig --name ${CLUSTER_NAME}
+                        aws eks --region ${env.AWS_DEFAULT_REGION} update-kubeconfig --name ${env.EKS_CLUSTER_NAME}
                         """
                         // Apply the Kubernetes manifests (deployment and service)
                         sh """
