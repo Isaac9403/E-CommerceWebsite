@@ -60,11 +60,9 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
                     script {
                         def dockerImage = docker.build(env.DOCKER_IMAGE_NAME, '.')
                     }
-                }
             }
         }
 
