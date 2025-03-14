@@ -7,7 +7,7 @@ pipeline {
         DOCKER_IMAGE_NAME = 'e-commerce-app'  // Name of your Docker image
         ECR_REPOSITORY = 'my-ecr-repo'  // Name of your ECR repository
         EKS_CLUSTER_NAME = 'my-eks-cluster'  // Name of your EKS cluster
-        AWS_ACCOUNT_ID = 'your-aws-account-id'  // Your AWS account ID
+        AWS_ACCOUNT_ID = '841162688382'  // Your AWS account ID
         MANIFEST_DIR = 'manifests/'  // Directory containing Kubernetes YAML files
     }
 
@@ -18,7 +18,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/your-repo/your-terraform-code.git' // Replace with your repo
+                git branch: 'feature/edit-file-structure', url: 'https://github.com/cashall-0/E-CommerceWebsite.git' // Replace with your repo
             }
         }
 
