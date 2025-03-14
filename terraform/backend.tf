@@ -12,7 +12,7 @@ terraform {
   backend "s3" {
     bucket         = "your-s3-bucket"
     key            = "eks-cluster/terraform.tfstate"
-    region         = var.region
+    region         = "eu-west-2"
     encrypt        = true
   }
 }
