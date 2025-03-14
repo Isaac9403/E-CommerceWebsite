@@ -24,70 +24,84 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                dir(env.TERRAFORM_DIR) {
-                    sh 'terraform init'
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+                    dir(env.TERRAFORM_DIR) {
+                        sh 'terraform init'
+                    }
                 }
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                dir(env.TERRAFORM_DIR) {
-                    sh 'terraform plan -out=tfplan'
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+                    dir(env.TERRAFORM_DIR) {
+                        sh 'terraform plan -out=tfplan'
+                    }
                 }
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                dir(env.TERRAFORM_DIR) {
-                    sh 'terraform apply -auto-approve tfplan'
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+                    dir(env.TERRAFORM_DIR) {
+                        sh 'terraform apply -auto-approve tfplan'
+                    }
                 }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    // Retrieve EKS cluster name from Terraform output
-                    env.EKS_CLUSTER_NAME = sh(script: "terraform output -raw eks_cluster_name", returnStdout: true).trim()
-                    def dockerImage = docker.build(env.DOCKER_IMAGE_NAME, '.')
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+                    script {
+                        // Retrieve EKS cluster name from Terraform output
+                        env.EKS_CLUSTER_NAME = sh(script: "terraform output -raw eks_cluster_name", returnStdout: true).trim()
+                        def dockerImage = docker.build(env.DOCKER_IMAGE_NAME, '.')
+                    }
                 }
             }
         }
 
         stage('Login to AWS ECR') {
             steps {
-                script {
-                    sh "aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_DEFAULT_REGION}.amazonaws.com"
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+                    script {
+                        sh "aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_DEFAULT_REGION}.amazonaws.com"
+                    }
                 }
             }
         }
 
         stage('Push Docker Image to ECR') {
             steps {
-                script {
-                    // Tag and push the Docker image to ECR
-                    def ecrRepoUri = "${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_DEFAULT_REGION}.amazonaws.com/${env.ECR_REPOSITORY}"
-                    sh "docker tag ${env.DOCKER_IMAGE_NAME}:latest ${ecrRepoUri}:latest"
-                    sh "docker push ${ecrRepoUri}:latest"
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+                    script {
+                        // Tag and push the Docker image to ECR
+                        def ecrRepoUri = "${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_DEFAULT_REGION}.amazonaws.com/${env.ECR_REPOSITORY}"
+                        sh "docker tag ${env.DOCKER_IMAGE_NAME}:latest ${ecrRepoUri}:latest"
+                        sh "docker push ${ecrRepoUri}:latest"
+                    }
                 }
             }
         }
 
         stage('Update Kubernetes Deployment with New Image') {
             steps {
-                script {
-                    // Modify the deployment.yaml file to use the new ECR image URI
-                    sh """
-                    sed -i 's|image: .*|image: ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_DEFAULT_REGION}.amazonaws.com/${env.ECR_REPOSITORY}:latest|' ${env.MANIFEST_DIR}/deployment.yaml
-                    """
-                    
-                    // Apply the Kubernetes manifests (deployment and service)
-                    sh """
-                    kubectl apply -f ${env.MANIFEST_DIR}/deployment.yaml --kubeconfig=kubeconfig.yaml
-                    kubectl apply -f ${env.MANIFEST_DIR}/service.yaml --kubeconfig=kubeconfig.yaml
-                    """
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+                    script {
+                        // Modify the deployment.yaml file to use the new ECR image URI
+                        sh """
+                        sed -i 's|image: .*|image: ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_DEFAULT_REGION}.amazonaws.com/${env.ECR_REPOSITORY}:latest|' ${env.MANIFEST_DIR}/deployment.yaml
+                        """
+                        
+                        // Apply the Kubernetes manifests (deployment and service)
+                        sh """
+                        kubectl apply -f ${env.MANIFEST_DIR}/deployment.yaml --kubeconfig=kubeconfig.yaml
+                        kubectl apply -f ${env.MANIFEST_DIR}/service.yaml --kubeconfig=kubeconfig.yaml
+                        """
+                    }
                 }
             }
         }
@@ -97,8 +111,10 @@ pipeline {
                 expression { return params.DESTROY_RESOURCES }  // Only execute if "DESTROY_RESOURCES" is true
             }
             steps {
-                dir(env.TERRAFORM_DIR) {
-                    sh 'terraform destroy -auto-approve tfplan'
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+                    dir(env.TERRAFORM_DIR) {
+                        sh 'terraform destroy -auto-approve tfplan'
+                    }
                 }
             }
         }
