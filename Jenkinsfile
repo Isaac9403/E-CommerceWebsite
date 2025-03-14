@@ -46,9 +46,13 @@ pipeline {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
                     dir(env.TERRAFORM_DIR) {
+                        // First step: Apply the Terraform plan
                         sh 'terraform apply -auto-approve tfplan'
-                        // Retrieve EKS cluster name from Terraform output
-                        env.EKS_CLUSTER_NAME = sh(script: "terraform output -raw eks_cluster_name", returnStdout: true).trim()
+                        
+                        // Second step: Retrieve the EKS cluster name from Terraform output
+                        script {
+                            env.EKS_CLUSTER_NAME = sh(script: "terraform output -raw eks_cluster_name", returnStdout: true).trim()
+                        }
                     }
                 }
             }
