@@ -7,7 +7,7 @@ pipeline {
         DOCKER_IMAGE_NAME = 'e-commerce-app'  // Name of your Docker image
         ECR_REPOSITORY = 'my-ecr-repo'  // Name of your ECR repository
         EKS_CLUSTER_NAME = 'promise-cluster'  // Name of your EKS cluster
-        AWS_ACCOUNT_ID = '841162688382'  // Your AWS account ID
+        AWS_ACCOUNT_ID = '841162688382'  // Your AWS account ID change to yours
         MANIFEST_DIR = 'manifests'  // Directory containing Kubernetes YAML files
     }
 
@@ -107,6 +107,7 @@ pipeline {
                         // Apply the Kubernetes manifests (deployment and service)
                         sh """
                         kubectl apply -f ${env.MANIFEST_DIR}/deployment.yaml
+                        kubectl delete -f svc e-commerce-web-app-service
                         kubectl apply -f ${env.MANIFEST_DIR}/service.yaml
                         """
                         sh "kubectl get svc -n default"
