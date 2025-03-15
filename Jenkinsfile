@@ -53,8 +53,8 @@ pipeline {
                         script {
                             def clusterName = sh(script: "terraform output -raw eks_cluster_name", returnStdout: true).trim()
                             sh "echo ${clusterName}"
-                    env.EKS_CLUSTER_NAME = clusterName
-                    echo "EKS Cluster Name: ${env.EKS_CLUSTER_NAME}"
+                            env.EKS_CLUSTER_NAME = clusterName
+                            echo "EKS Cluster Name: ${env.EKS_CLUSTER_NAME}"
                         }
                     }
                 }
