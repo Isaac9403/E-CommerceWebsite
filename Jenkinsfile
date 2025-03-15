@@ -109,6 +109,7 @@ pipeline {
                         kubectl apply -f ${env.MANIFEST_DIR}/deployment.yaml
                         kubectl apply -f ${env.MANIFEST_DIR}/service.yaml
                         """
+                        sh "kubectl get svc -n default"
                     }
                 }
             }
