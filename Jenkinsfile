@@ -107,7 +107,7 @@ pipeline {
                         // Apply the Kubernetes manifests (deployment and service)
                         sh """
                         kubectl apply -f ${env.MANIFEST_DIR}/deployment.yaml
-                        kubectl delete -f svc e-commerce-web-app-service
+                        kubectl delete -f services e-commerce-web-app-service
                         kubectl apply -f ${env.MANIFEST_DIR}/service.yaml
                         """
                         sh "kubectl get svc -n default"
