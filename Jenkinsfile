@@ -107,7 +107,6 @@ pipeline {
                         // Apply the Kubernetes manifests (deployment and service)
                         sh """
                         kubectl apply -f ${env.MANIFEST_DIR}/deployment.yaml
-                        kubectl delete service e-commerce-web-app-service
                         kubectl apply -f ${env.MANIFEST_DIR}/service.yaml
                         """
                         sh "kubectl get svc -n default"
@@ -123,7 +122,7 @@ pipeline {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
                     dir(env.TERRAFORM_DIR) {
-                        sh 'terraform destroy -auto-approve tfplan'
+                        sh 'terraform destroy -auto-approve'
                     }
                 }
             }
