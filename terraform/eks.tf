@@ -44,7 +44,5 @@ module "eks" {
     }
   }
 
-  tags = {
-    Example = local.tags
-  }
+  tags = local.tags
 }
